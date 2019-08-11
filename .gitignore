@@ -1,0 +1,7 @@
+# Cmake Stuff:
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Other:
