@@ -7,7 +7,9 @@ A Checkers AI (eventually), with catch2 testing and SFML graphics. Got lots of p
 # How to run Project:
 ( Not yet tested on another machine. You'll need to figure out dependencies for now ) <- TODO
 ```
-	1) "cmake ."
-	2) "make"
-	3) ./CheckersAI <cli options comming soon. For now, edit main.cpp>
+	1) apt install make cmake libsfml-dev
+	2) "cmake ."
+	3) "make"
+	4) ./CheckersAI <cli options comming soon. For now, edit main.cpp>
+	note: rmCMake.sh is there to help if you need it...
 ```
