@@ -15,7 +15,7 @@ const std::string PATH_TO_IMAGES = "images/";
 
 // for ALL games:
 const std::string START_BOARD = "rrrrrrrrrrrr________bbbbbbbbbbbb";
-const bool FIRST_TURNS_RANDO = false;
+const uint NUM_RANDO_TURNS = 0;
 const float START_KING_VAL = 1.4f; // relative to normal checker = 1.
 
 // search limits:

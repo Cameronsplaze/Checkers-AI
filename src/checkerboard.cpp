@@ -326,14 +326,13 @@ void CheckerBoardManager::JumpingRecursion(uint i, uint j, bool currTeamDirectio
 std::bitset<96> getStartBoard()
 {
 	std::bitset<96> theBoard = stringToBoard(START_BOARD);
-	if(FIRST_TURNS_RANDO == false)
+	bool redTurn = true;
+	for(uint i=0; i<NUM_RANDO_TURNS; ++i)
 	{
-		return theBoard;
+		theBoard = CheckerBoardManager(theBoard, redTurn, false).getRandoMove();
+		redTurn = !redTurn;
 	}
 
-	theBoard = CheckerBoardManager(theBoard, true, false).getRandoMove();
-	theBoard = CheckerBoardManager(theBoard,false, false).getRandoMove();
-	theBoard = CheckerBoardManager(theBoard,true, false).getRandoMove();
 	return theBoard;
 }
 

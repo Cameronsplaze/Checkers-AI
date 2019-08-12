@@ -8,75 +8,145 @@
 #include <vector>
 #include <iostream>
 
+TEST_CASE("Testing global constants - Correctness (globalconsts.hpp)")
+{
+	SECTION("Checking START_BOARD")
+	{
+		REQUIRE( START_BOARD.size() == 32 );
+		for(uint i=0; i<START_BOARD.size(); ++i)
+			if(START_BOARD[i] != 'r' && START_BOARD[i] != 'R' && START_BOARD[i] != '_' && START_BOARD[i] != 'b' && START_BOARD[i] != 'B')
+				REQUIRE( "UNKNOWN CHAR IN START_BOARD" == "this will fail" );
+	}
+}
 
-TEST_CASE("Testing Class - CheckerBoardManager (inside checkerboard.hpp")
+TEST_CASE("Testing Class - CheckerBoardManager (checkerboard.hpp)")
 {
 	bool redTurn = true; // pass to test red
 	bool blackTurn = false; // pass to test black
-				//					00000000001111111111222222222233
-    			//					01234567890123456789012345678901
-	const std::string charBoard1 = "________________________________"; // blank case
-	const std::string charBoard2 = "____________B_________R_________"; // red in middle, black on edge
-	const std::string charBoard3 = "___B__rr_____r__b_______________"; // non king sould jump, but not back, king should
 
-	SECTION("Make sure input is valid")
+	// Boards as strings:
+	const std::string blankBoard_str = "________________________________"; // blank case
+	const std::string basicBoard1_str = "____________B_________R_________"; // red in middle, black on edge
+	const std::string basicBoard2_str = "___B__rr_____r__b_______________"; // non king sould jump, but not back, king should
+	// SAME Boards as Bits:
+	// (first 32 = isKing, second 32 = isRed, third 32 = isBlack. Starts on top left square, and goes across first)
+	const std::bitset<96> blankBoard_bit(std::string("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+	const std::bitset<96> basicBoard1_bit(std::string("000000000000000000010000000000000000000001000000000000000000000000000000010000000001000000000000"));
+	const std::bitset<96> basicBoard2_bit(std::string("000000000000000100000000000010000000000000000000001000001100000000000000000000000000000000001000"));
+
+	SECTION("Test boardToString method")
 	{
-		REQUIRE( charBoard1.size() == 32 ); 
-		REQUIRE( charBoard2.size() == 32 ); 
-		REQUIRE( charBoard3.size() == 32 );
+		REQUIRE( boardToString(blankBoard_bit) == blankBoard_str );
+		REQUIRE( boardToString(basicBoard1_bit) == basicBoard1_str );
+		REQUIRE( boardToString(basicBoard2_bit) == basicBoard2_str );
 	}
-	/*
-
-	const std::bitset<96> bitBoard1 = stringToBoard(charBoard1);
-	const std::bitset<96> bitBoard2 = stringToBoard(charBoard2);
-	const std::bitset<96> bitBoard3 = stringToBoard(charBoard3);
-
-	CheckerBoardManager board1r( bitBoard1, redTurn, false);
-	CheckerBoardManager board1b( bitBoard1, blackTurn, false);
-
-	SECTION("Testing Blank board")
+	SECTION("Test stringToBoard method")
 	{
+		REQUIRE( stringToBoard(blankBoard_str) == blankBoard_bit );
+		REQUIRE( stringToBoard(basicBoard1_str) == basicBoard1_bit );
+		REQUIRE( stringToBoard(basicBoard2_str) == basicBoard2_bit );
+	}
+
+	// Now you can use stringToBoard and BoardToString in other tests:
+
+	SECTION("Test Blank board - Both players")
+	{	
+		CheckerBoardManager board1r( blankBoard_bit, redTurn, false);
+		CheckerBoardManager board1b( blankBoard_bit, blackTurn, false);
 		REQUIRE( board1r.getAllMoves().size() == 0 );
 		REQUIRE( board1b.getAllMoves().size() == 0 );
 	}
-
-	CheckerBoardManager board2r( bitBoard2, redTurn, false);
-	CheckerBoardManager board2b( bitBoard2, blackTurn, false);
-
-	std::vector<std::bitset<96>> redPossMoves;
-	std::vector<std::bitset<96>> blackPossMoves;
-
-	redPossMoves.push_back(stringToBoard("____________B___R___________")); // red on 17
-	redPossMoves.push_back(stringToBoard("____________B____R__________")); // red on 18
-	redPossMoves.push_back(stringToBoard("____________B___________R___")); // red on 25
-	redPossMoves.push_back(stringToBoard("____________B____________R__")); // red on 26
-
-	blackPossMoves.push_back(stringToBoard("________B____________R__________")); // black on 8
-	blackPossMoves.push_back(stringToBoard("________________B____R__________")); // black on 16
-
-	for(uint i=0; i<board2r.getAllMoves().size(); ++i)
+	SECTION("Test Two-piece board - Both players")
 	{
-		auto itr = std::find(redPossMoves.begin(), redPossMoves.end(), board2r.getAllMoves()[i]);
-		redPossMoves.erase(itr);
+		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardManager(basicBoard1_bit, redTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardManager(basicBoard1_bit, blackTurn, false).getAllMoves();
+
+		std::vector<std::bitset<96>> redPossMoves;
+		std::vector<std::bitset<96>> blackPossMoves;
+
+		redPossMoves.push_back(stringToBoard("____________B____R______________")); // red on 17
+		redPossMoves.push_back(stringToBoard("____________B_____R_____________")); // red on 18
+		redPossMoves.push_back(stringToBoard("____________B____________R______")); // red on 25
+		redPossMoves.push_back(stringToBoard("____________B_____________R_____")); // red on 26
+
+		blackPossMoves.push_back(stringToBoard("________B_____________R_________ ")); // black on 8
+		blackPossMoves.push_back(stringToBoard("________________B_____R_________")); // black on 16
+
+		// Confirm the lists are the same size:
+		REQUIRE(redPossMoves.size() == BoardMoves_red.size());
+		REQUIRE(blackPossMoves.size() == BoardMoves_black.size());
+
+		// Confirm that AFTER removing all possible from the other, sizes are 0:
+		for(uint i=0; i<BoardMoves_red.size(); ++i)
+		{
+			for(uint j=0; j<redPossMoves.size(); ++j)
+			{
+				if(BoardMoves_red[i] == redPossMoves[j])
+				{
+					redPossMoves.erase(redPossMoves.begin() + j);
+					break;
+				}
+			}
+		}
+		for(uint i=0; i<BoardMoves_black.size(); ++i)
+		{
+			for(uint j=0; j<blackPossMoves.size(); ++j)
+			{
+				if(BoardMoves_black[i] == blackPossMoves[j])
+				{
+					blackPossMoves.erase(blackPossMoves.begin() + j);
+					break;
+				}
+			}
+		}
+		// Size = 0:
+		REQUIRE(redPossMoves.size() == 0);
+		REQUIRE(blackPossMoves.size() == 0);
 	}
 
-	
-
-	SECTION("Testing Basic board - Red in middle, Black on edge")
+	SECTION("Testing Advanced board - Black can move king/pawn, Red forced Jump")
 	{
-		REQUIRE( board2r.getAllMoves().size() == 4 );
-		REQUIRE( board2b.getAllMoves().size() == 2 );
-		REQUIRE( redPossMoves.size() == 0 );
-		REQUIRE( blackPossMoves.size() == 0 );
+		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardManager(basicBoard2_bit, redTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardManager(basicBoard2_bit, blackTurn, false).getAllMoves();
+
+		std::vector<std::bitset<96>> redPossMoves;
+		std::vector<std::bitset<96>> blackPossMoves;
+
+		redPossMoves.push_back(stringToBoard("___B__rr____________r___________"));
+
+		blackPossMoves.push_back(stringToBoard("_B___________r__b_______________ ")); // black on 8
+		blackPossMoves.push_back(stringToBoard("__BB___r________________________")); // black on 16
+
+		// Confirm the lists are the same size:
+		REQUIRE(redPossMoves.size() == BoardMoves_red.size());
+		REQUIRE(blackPossMoves.size() == BoardMoves_black.size());
+
+		// Confirm that AFTER removing all possible from the other, sizes are 0:
+		for(uint i=0; i<BoardMoves_red.size(); ++i)
+		{
+			for(uint j=0; j<redPossMoves.size(); ++j)
+			{
+				if(BoardMoves_red[i] == redPossMoves[j])
+				{
+					redPossMoves.erase(redPossMoves.begin() + j);
+					break;
+				}
+			}
+		}
+		for(uint i=0; i<BoardMoves_black.size(); ++i)
+		{
+			for(uint j=0; j<blackPossMoves.size(); ++j)
+			{
+				if(BoardMoves_black[i] == blackPossMoves[j])
+				{
+					blackPossMoves.erase(blackPossMoves.begin() + j);
+					break;
+				}
+			}
+		}
+		// Size = 0:
+		REQUIRE(redPossMoves.size() == 0);
+		REQUIRE(blackPossMoves.size() == 0);
 	}
 
-	CheckerBoardManager board3r( bitBoard3, redTurn, false);
-	CheckerBoardManager board3b( bitBoard3, blackTurn, false);
-
-	SECTION("Testing Advanced board - king goes both ways, non-king shouldn't (black)")
-	{
-		REQUIRE ( true );
-	}
-	
-	*/
 }

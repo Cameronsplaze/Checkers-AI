@@ -5,17 +5,17 @@
 
 
 
-CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string&player2)
-	: window_(sf::VideoMode(648,648), "A not-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close),
+CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string &player2)
+	: window_(sf::VideoMode(648,648), "A not-yet-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close),
 	  player1_(player1, true, window_),
 	  player2_(player2, false, window_)
 {
 	window_.setFramerateLimit(60);
-	if(FIRST_TURNS_RANDO == true){
-		isPlayer1Turn = false;
+	if(NUM_RANDO_TURNS % 2 == 0){
+		isPlayer1Turn = true;
 	}
 	else{
-		isPlayer1Turn = true;
+		isPlayer1Turn = false;
 	}
 
 	// load textures - If fails, can't do anything
