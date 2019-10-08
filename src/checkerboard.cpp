@@ -7,13 +7,13 @@
 //***************************************************
 // 			PUBLIC METHODS
 //***************************************************
+CheckerBoardMoves::CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn){
+	CheckerBoardMoves(startBoard, redPlayerTurn, false);
+}
 
-CheckerBoardManager::CheckerBoardManager(const std::bitset<96> &startBoard, bool redPlayerTurn, bool jumpingOnce)
+CheckerBoardMoves::CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce):
+	redTeamTurn_(redPlayerTurn), firstJumpFound_(false), jumpOnlyOnce_(jumpOnlyOnce)
 {
-	redTeamTurn_ = redPlayerTurn;
-	firstJumpFound_ = false;
-	jumpOnlyOnce_ = jumpingOnce;
-
 	if(redTeamTurn_)
 	{
 		currTeamMoveBoard_ = RED_MOVE_BOARD;
@@ -28,7 +28,6 @@ CheckerBoardManager::CheckerBoardManager(const std::bitset<96> &startBoard, bool
 		oppTeamMoveBoard_ = RED_MOVE_BOARD;
 		oppTeamJumpBoard_ = RED_JUMP_BOARD;
 	}
-	// WHEN YOU ADD DEBUG STUFF, ADD IF ELSE TO THIS::
 
 	checkers_.resize(32);
 	for(uint i=0; i<32; ++i)
@@ -63,12 +62,10 @@ CheckerBoardManager::CheckerBoardManager(const std::bitset<96> &startBoard, bool
 			}
 		}
 	}
-
-	// Start figuring out what can go where...
 	updatePossibleMoves();
 }
 
-std::bitset<96> CheckerBoardManager::getRandoMove()
+std::bitset<96> CheckerBoardMoves::getRandoMove()
 {
     if(possibleMoves_.size() == 0)
     {
@@ -91,12 +88,12 @@ std::bitset<96> CheckerBoardManager::getRandoMove()
     }
 }
 
-std::vector<std::bitset<96>> CheckerBoardManager::getAllMoves()
+std::vector<std::bitset<96>> CheckerBoardMoves::getAllMoves()
 {
 	return possibleMoves_;
 }
 
-bool CheckerBoardManager::isValidBoard(std::bitset<96> &newBoard)
+bool CheckerBoardMoves::isValidBoard(std::bitset<96> &newBoard)
 {
 	for(uint i=0; i<possibleMoves_.size(); ++i)
 	{
@@ -108,7 +105,7 @@ bool CheckerBoardManager::isValidBoard(std::bitset<96> &newBoard)
 	return false;
 }
 
-std::bitset<96> CheckerBoardManager::turnBoardToBit()
+std::bitset<96> CheckerBoardMoves::turnBoardToBit()
 {
 	std::bitset<96> returnMe(0);
 	for(uint i=0; i<32; ++i){
@@ -134,8 +131,9 @@ std::bitset<96> CheckerBoardManager::turnBoardToBit()
 // 			REST OF THE METHODS ARE PRIVATE
 //***************************************************
 
-void CheckerBoardManager::updatePossibleMoves()
+void CheckerBoardMoves::updatePossibleMoves()
 {
+
 	for(uint i=0; i<checkers_.size(); ++i)
 	{
 		// If no checker on that square, or wrong teams checker, do nothing....
@@ -161,7 +159,7 @@ void CheckerBoardManager::updatePossibleMoves()
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
-void CheckerBoardManager::moveJumpManager(uint i, uint j, bool goingRightWay)
+void CheckerBoardMoves::moveJumpManager(uint i, uint j, bool goingRightWay)
 {
 
 	// Use the correct boards:
@@ -235,7 +233,7 @@ void CheckerBoardManager::moveJumpManager(uint i, uint j, bool goingRightWay)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
-void CheckerBoardManager::JumpingRecursion(uint i, uint j, bool currTeamDirection) // currTeamDirection gets passed going right way
+void CheckerBoardMoves::JumpingRecursion(uint i, uint j, bool currTeamDirection) // currTeamDirection gets passed going right way
 {
 	std::unique_ptr<TheChecker> pieceJumped;
 	uint k;
@@ -329,7 +327,7 @@ std::bitset<96> getStartBoard()
 	bool redTurn = true;
 	for(uint i=0; i<NUM_RANDO_TURNS; ++i)
 	{
-		theBoard = CheckerBoardManager(theBoard, redTurn, false).getRandoMove();
+		theBoard = CheckerBoardMoves(theBoard, redTurn).getRandoMove();
 		redTurn = !redTurn;
 	}
 
