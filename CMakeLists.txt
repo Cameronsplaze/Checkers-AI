@@ -31,6 +31,7 @@ set(HEADER_FILES
 	include/managerSFML.hpp
 	include/player.hpp
 	include/negamax.hpp
+	include/cxxopts.hpp
 )
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURSE_FILES})
