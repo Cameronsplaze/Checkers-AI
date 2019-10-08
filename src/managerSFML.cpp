@@ -11,15 +11,12 @@ CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string &
 	  player2_(player2, false, window_)
 {
 	window_.setFramerateLimit(60);
-	if(NUM_RANDO_TURNS % 2 == 0){
-		isPlayer1Turn = true;
-	}
-	else{
-		isPlayer1Turn = false;
-	}
+	// If even number of turns went by, reds turn:
+	isPlayer1Turn = NUM_RANDO_TURNS % 2 == 0;
 
 	// load textures - If fails, can't do anything
-	if(!loadTextures()){
+	bool success = loadTextures();
+	if(!success){
 		return;
 	}
 	// setup checkers_ vec for updating board
@@ -70,7 +67,7 @@ void CheckerboardGUI::updateSprites(std::bitset<96> startBoard)
 	checkers_.resize(32);
 	for(uint i=0; i<32; ++i)
 	{
-				// if no checker
+		// if no checker
 		if(startBoard[i+32] == 0 && startBoard[i+64] == 0)
 		{
 			checkers_[i] = nullptr;

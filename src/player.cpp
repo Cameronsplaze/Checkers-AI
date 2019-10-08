@@ -35,12 +35,12 @@ std::bitset<96> Player::getMove(std::vector<std::unique_ptr<SpriteChecker>> &che
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(2s);
 		std::bitset<96> bitboard = checkersToBoard(checkers);
-		return CheckerBoardManager(bitboard, isRedTeam_, false).getRandoMove();
+		return CheckerBoardMoves(bitboard, isRedTeam_).getRandoMove();
 	}
 	else if(playerType_ == "piece_count")
 	{
 		std::bitset<96> bitboard = checkersToBoard(checkers);
-		return Negamax(bitboard, isRedTeam_, false, false).getBestBoard();
+		return Negamax(bitboard, isRedTeam_).getBestBoard();
 	}
 	std::bitset<96> tmp(0);
 	return tmp;
@@ -49,8 +49,8 @@ std::bitset<96> Player::getMove(std::vector<std::unique_ptr<SpriteChecker>> &che
 
 void Player::humanManager(std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 {
-	CheckerBoardManager allMoves(checkersToBoard(checkers), isRedTeam_, false);
-	CheckerBoardManager oneLayer(checkersToBoard(checkers), isRedTeam_, true);
+	CheckerBoardMoves allMoves(checkersToBoard(checkers), isRedTeam_);
+	CheckerBoardMoves oneLayer(checkersToBoard(checkers), isRedTeam_, true);
 
 	sf::Event evnt;
 	while( window_.isOpen() )
@@ -91,8 +91,8 @@ void Player::humanManager(std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 
 bool Player::JumpingRecursively(int pieceIndex, std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 {
-	CheckerBoardManager allMoves(checkersToBoard(checkers), isRedTeam_, false);
-	CheckerBoardManager oneLayer(checkersToBoard(checkers), isRedTeam_, true);
+	CheckerBoardMoves allMoves(checkersToBoard(checkers), isRedTeam_, false);
+	CheckerBoardMoves oneLayer(checkersToBoard(checkers), isRedTeam_, true);
 	while(window_.isOpen())
 	{
 		sf::Event evnt;
