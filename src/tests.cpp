@@ -19,7 +19,7 @@ TEST_CASE("Testing global constants - Correctness (globalconsts.hpp)")
 	}
 }
 
-TEST_CASE("Testing Class - CheckerBoardManager (checkerboard.hpp)")
+TEST_CASE("Testing Class - CheckerBoardMoves (checkerboard.hpp)")
 {
 	bool redTurn = true; // pass to test red
 	bool blackTurn = false; // pass to test black
@@ -51,15 +51,15 @@ TEST_CASE("Testing Class - CheckerBoardManager (checkerboard.hpp)")
 
 	SECTION("Test Blank board - Both players")
 	{	
-		CheckerBoardManager board1r( blankBoard_bit, redTurn, false);
-		CheckerBoardManager board1b( blankBoard_bit, blackTurn, false);
+		CheckerBoardMoves board1r( blankBoard_bit, redTurn, false);
+		CheckerBoardMoves board1b( blankBoard_bit, blackTurn, false);
 		REQUIRE( board1r.getAllMoves().size() == 0 );
 		REQUIRE( board1b.getAllMoves().size() == 0 );
 	}
 	SECTION("Test Two-piece board - Both players")
 	{
-		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardManager(basicBoard1_bit, redTurn, false).getAllMoves();
-		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardManager(basicBoard1_bit, blackTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardMoves(basicBoard1_bit, redTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardMoves(basicBoard1_bit, blackTurn, false).getAllMoves();
 
 		std::vector<std::bitset<96>> redPossMoves;
 		std::vector<std::bitset<96>> blackPossMoves;
@@ -106,8 +106,8 @@ TEST_CASE("Testing Class - CheckerBoardManager (checkerboard.hpp)")
 
 	SECTION("Testing Advanced board - Black can move king/pawn, Red forced Jump")
 	{
-		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardManager(basicBoard2_bit, redTurn, false).getAllMoves();
-		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardManager(basicBoard2_bit, blackTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_red = CheckerBoardMoves(basicBoard2_bit, redTurn, false).getAllMoves();
+		std::vector<std::bitset<96>> BoardMoves_black = CheckerBoardMoves(basicBoard2_bit, blackTurn, false).getAllMoves();
 
 		std::vector<std::bitset<96>> redPossMoves;
 		std::vector<std::bitset<96>> blackPossMoves;
