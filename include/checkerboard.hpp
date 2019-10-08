@@ -11,7 +11,8 @@
 #include "globalconsts.hpp"
 
 
-class TheChecker{
+class TheChecker
+{
 public:
 	TheChecker(bool onRedTeam, bool isKing)
 	{ 
@@ -33,9 +34,11 @@ private:
 };
 
 
-class CheckerBoardManager{
+class CheckerBoardMoves
+{
 public:
-	CheckerBoardManager(const std::bitset<96> &startBoard, bool redPlayerTurn, bool jumpingOnce_); 
+	CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn); //Default: jumpOnlyOnce=False
+	CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce); 
 
 	std::bitset<96> getRandoMove();
 	std::vector<std::bitset<96>> getAllMoves();
