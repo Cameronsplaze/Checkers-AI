@@ -2,7 +2,7 @@
 
 #include "../include/negamax.hpp"
 
-float pieceCount(const std::bitset<96> &board, bool redTeam)
+float pieceCountScore(const std::bitset<96> &board, const bool redTeam)
 {
 	int redScore = 0;
 	int blackScore = 0;
@@ -47,61 +47,44 @@ float pieceCount(const std::bitset<96> &board, bool redTeam)
 		return (float)(blackScore - redScore);
 	}
 }
-
-Negamax::Negamax(const std::bitset<96> &board, bool isRedTeam, const bool usingNeuralNet, const bool doIterativeDeepening) :
-	isRedTeam_(isRedTeam),
-	usingNeuralNet_(usingNeuralNet)
+Negamax::Negamax(const std::bitset<96> &board, bool isRedTeam):
+	isRedTeam_(isRedTeam)
 {
-	std::vector<std::bitset<96>> boards = std::move( CheckerBoardManager(board, isRedTeam, false).getAllMoves() );
-	possibleMoves_.resize(boards.size());
-	for(uint i=0; i<boards.size(); ++i)
+	std::vector<std::bitset<96>> possible_moves = std::move( CheckerBoardMoves(board, isRedTeam_).getAllMoves() );
+	// zip the board, with it's known score, together into possibleMoves_
+	possibleMoves_.resize(possible_moves.size());
+	for(uint i=0; i<possible_moves.size(); ++i)
 	{
-		possibleMoves_[i] = std::make_pair(boards[i], NegamaxRecursive(board, START_DEPTH, isRedTeam));
+		possibleMoves_[i] = std::make_pair(possible_moves[i], NegamaxRecursive(board, START_DEPTH, isRedTeam_));
 	}
+	// Sort the list with best score at [0]:
 	std::sort(possibleMoves_.begin(), possibleMoves_.end(), [](auto &a, auto &b) {
 		return a.second > b.second;
 	});
 
-	std::cout << "Board Scores for: " << isRedTeam << " scores: ";
-	for(uint i=0; i<possibleMoves_.size(); ++i)
-		std::cout << possibleMoves_[i].second << " ";
-	std::cout << std::endl << std::endl;
-	
-	if(doIterativeDeepening == false){
-		return;
-	}
-
-	uint depth = START_DEPTH;
-	while(true)
-	{
-		depth += 2;
-
-		//call recursive on all (deeper on first part?).
-		// if time is out, return
-		// sort everything
-		// -> sort after return because if time IS out, you don't know how deep it got.
-	}
 }
 
-float Negamax::NegamaxRecursive(const std::bitset<96> &board, const uint depthLeft, const bool color)
-{
-	if(depthLeft == 0 && isRedTeam_ != color)
-		std::cout << "Flip team?" << std::endl;
-	if( depthLeft == 0 && isRedTeam_ == color)// && (function call for horizen efect)
-	{ 
-		return pieceCount(board, isRedTeam_);
+// This is called AFTER you get the first set of boards. It's saying if you move here, what will opponent do.
+// Default: optimizingPlayer=False:
+float Negamax::NegamaxRecursive(const std::bitset<96> &board, const uint depth_left, const bool maximizing_player)
+{	
+	// You can find who's color moves next, based on who started, and are they moving now:
+	bool isRedsTurn = !(isRedTeam_^maximizing_player);
+
+	std::vector<std::bitset<96>> possible_moves = std::move( CheckerBoardMoves(board, isRedsTurn).getAllMoves() );
+	// Split apart \/depth_left\/ to above ^possible_moves^ for possible speedup. Keeping it here for now for readability
+	int value = (maximizing_player) ? 1 : -1; 
+	if( depth_left == 0 || possible_moves.size() == 0 ){
+		return value * pieceCountScore(board, isRedTeam_);
 	}
-	std::vector<std::bitset<96>> children = std::move(CheckerBoardManager(board, color, false).getAllMoves());
-	if(children.size() == 0){
-		// return positive / negative infinity? here, someone wins / looses
-	}
-	float value = -1 * NegamaxRecursive(children[0], depthLeft-1, !color);
-	for(uint i=1; i<children.size(); ++i)
+	// closest to inf you'll get. (TODO: see how much speedup you'll get if you fencepost this; check if optimizer already doing it?)
+	float best_score = std::numeric_limits<float>::max();
+	for(uint i=0; i<possible_moves.size(); ++i)
 	{
-		value = std::max(value, -1 * NegamaxRecursive(children[i], depthLeft-1, !color));
+		best_score = std::max(best_score, NegamaxRecursive(possible_moves[i], depth_left-1, !maximizing_player));
 	}
-	return value;
-	// ADD TO CHECKERMANAGER: basic sort before returning. speeds up alpha-beta.
+	return best_score;
+
 }
 
 std::bitset<96> Negamax::getBestBoard()
