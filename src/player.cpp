@@ -33,6 +33,7 @@ std::bitset<96> Player::getMove(std::vector<std::unique_ptr<SpriteChecker>> &che
 	else if(playerType_ == "random")
 	{
 		using namespace std::chrono_literals;
+		// Just so that it doesn't instantly finish moving. Might remove later:
 		std::this_thread::sleep_for(2s);
 		std::bitset<96> bitboard = checkersToBoard(checkers);
 		return CheckerBoardMoves(bitboard, isRedTeam_).getRandoMove();
@@ -49,9 +50,6 @@ std::bitset<96> Player::getMove(std::vector<std::unique_ptr<SpriteChecker>> &che
 
 void Player::humanManager(std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 {
-	CheckerBoardMoves allMoves(checkersToBoard(checkers), isRedTeam_);
-	CheckerBoardMoves oneLayer(checkersToBoard(checkers), isRedTeam_, true);
-
 	sf::Event evnt;
 	while( window_.isOpen() )
 	{
@@ -82,17 +80,17 @@ void Player::humanManager(std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 						window_.display();
 					}
 				}break;
-
 			}
 		}
 	}
-
 }
 
 bool Player::JumpingRecursively(int pieceIndex, std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 {
+	// To help check if you finished moving:
 	CheckerBoardMoves allMoves(checkersToBoard(checkers), isRedTeam_, false);
 	CheckerBoardMoves oneLayer(checkersToBoard(checkers), isRedTeam_, true);
+
 	while(window_.isOpen())
 	{
 		sf::Event evnt;
@@ -107,6 +105,7 @@ bool Player::JumpingRecursively(int pieceIndex, std::vector<std::unique_ptr<Spri
 
 				case sf::Event::MouseButtonPressed:{
 					int position = MousePositionToInt(sf::Mouse::getPosition(window_));
+					// If you clicked somewhere invalid, just ignore it:
 					if( position == -1 || checkers[position] != nullptr )
 					{
 						return false;

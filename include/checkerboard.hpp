@@ -37,8 +37,7 @@ private:
 class CheckerBoardMoves
 {
 public:
-	CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn); //Default: jumpOnlyOnce=False
-	CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce); 
+	CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce = false); 
 
 	std::bitset<96> getRandoMove();
 	std::vector<std::bitset<96>> getAllMoves();

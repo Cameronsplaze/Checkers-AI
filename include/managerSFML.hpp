@@ -31,7 +31,7 @@ private:
 	Player player1_;
 	Player player2_;
 
-	bool isPlayer1Turn;
+	bool isPlayer1Turn_;
 	// Textures
 	sf::Texture checkerboardTexture_;
 	sf::Texture whiteCheckerTexture_;

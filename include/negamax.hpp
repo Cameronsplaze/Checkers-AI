@@ -22,7 +22,9 @@ public:
 	std::bitset<96> getBestBoard();
 	
 private:
-	std::vector<std::pair< std::bitset<96>,float >>possibleMoves_;
+	// Each element in vector is (board, board's score):
+	std::vector<std::pair< std::bitset<96>, float >>possibleMoves_;
+	// true = Red, false = Black
 	const bool isRedTeam_;
 };
 

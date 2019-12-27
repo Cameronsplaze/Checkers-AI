@@ -7,9 +7,6 @@
 //***************************************************
 // 			PUBLIC METHODS
 //***************************************************
-CheckerBoardMoves::CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn){
-	CheckerBoardMoves(startBoard, redPlayerTurn, false);
-}
 
 CheckerBoardMoves::CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce):
 	redTeamTurn_(redPlayerTurn), firstJumpFound_(false), jumpOnlyOnce_(jumpOnlyOnce)
@@ -109,13 +106,15 @@ std::bitset<96> CheckerBoardMoves::turnBoardToBit()
 {
 	std::bitset<96> returnMe(0);
 	for(uint i=0; i<32; ++i){
-		// If null, do nothing. Update king list reguardless of color
+		// If null, do nothing.
 		if(checkers_[i] == nullptr)
 			continue;
 		
+		// 0-31=King, 32-63=Red, 64-95=Black:
+		// Update king list reguardless of color
 		if(checkers_[i]->isKing() == true)
 			returnMe[i] = 1;
-
+		// Update which side it's on:
 		if(checkers_[i]->isTeamRed() == true){
 			returnMe[i+32] = 1;
 		}

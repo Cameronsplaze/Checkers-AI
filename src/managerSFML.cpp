@@ -8,11 +8,10 @@
 CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string &player2)
 	: window_(sf::VideoMode(648,648), "A not-yet-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close),
 	  player1_(player1, true, window_),
-	  player2_(player2, false, window_)
+	  player2_(player2, false, window_),
+	  isPlayer1Turn_(NUM_RANDO_TURNS % 2 == 0)
 {
-	window_.setFramerateLimit(60);
-	// If even number of turns went by, reds turn:
-	isPlayer1Turn = NUM_RANDO_TURNS % 2 == 0;
+	window_.setFramerateLimit(30);
 
 	// load textures - If fails, can't do anything
 	bool success = loadTextures();
@@ -123,18 +122,34 @@ void CheckerboardGUI::mainGameloop()
 {
 	while (window_.isOpen())
 	{
-		windowUpdate();
+		// Look into this, instead of the window in constructor:
+		// sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
 
-		if(isPlayer1Turn){
-			updateSprites(player1_.getMove(checkers_));
-			isPlayer1Turn = false;
-		}
-		else{
-			updateSprites(player2_.getMove(checkers_));
-			isPlayer1Turn = true;
+		sf::Event event;
+
+		while(window_.pollEvent(event))
+		{
+			// If they closed the window:
+			if(event.type == sf::Event::Closed){
+				window_.close();
+				return;
+			}
+			else
+			{
+				windowUpdate();
+				if(isPlayer1Turn_){
+					updateSprites(player1_.getMove(checkers_));
+					isPlayer1Turn_ = false;
+				}
+				else{
+					updateSprites(player2_.getMove(checkers_));
+					isPlayer1Turn_ = true;
+				}
+			}
 		}
 	}
 }
+
 
 void CheckerboardGUI::windowUpdate()
 {

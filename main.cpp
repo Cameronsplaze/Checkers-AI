@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
         std::cout << "IT WORKS!!!!" << std::endl;
         return 0;
     }
-    std::cout << boardToString(getStartBoard()) << std::endl;
-    return 0;
+    // std::cout << boardToString(getStartBoard()) << std::endl;
+    // return 0;
 
     				//	01234567890123456789012345678901
     // std::string tmp1 = "b___r____BR______Rbbr____Br_____";
@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     // std::cout << tmpB2 << " Start" << std::endl; 
 
     // ######################
-    CheckerboardGUI("random", "random");
-    // CheckerboardGUI("random", "piece_count");
+    // CheckerboardGUI("random", "random");
+    CheckerboardGUI("random", "piece_count");
     // ######################
 
     // std::vector<std::bitset<96>> possBoards = std::move( CheckerBoardMoves(tmpB1, redTurn, false).getAllMoves() );

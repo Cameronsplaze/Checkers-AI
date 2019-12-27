@@ -47,6 +47,7 @@ float pieceCountScore(const std::bitset<96> &board, const bool redTeam)
 		return (float)(blackScore - redScore);
 	}
 }
+
 Negamax::Negamax(const std::bitset<96> &board, bool isRedTeam):
 	isRedTeam_(isRedTeam)
 {
@@ -61,7 +62,10 @@ Negamax::Negamax(const std::bitset<96> &board, bool isRedTeam):
 	std::sort(possibleMoves_.begin(), possibleMoves_.end(), [](auto &a, auto &b) {
 		return a.second > b.second;
 	});
-
+	std::cout << "Boards:";
+	for(uint i=0; i<possibleMoves_.size(); ++i){
+		std::cout << "    Board: " << possibleMoves_[i].first << " Score: " << possibleMoves_[i].second << std::endl;
+	}
 }
 
 // This is called AFTER you get the first set of boards. It's saying if you move here, what will opponent do.

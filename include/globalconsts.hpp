@@ -20,6 +20,7 @@ const float START_KING_VAL = 1.4f; // relative to normal checker = 1.
 
 // search limits:
 const uint START_DEPTH = 8;
+const uint END_DEPTH = 8;
 // clock duration, 15s here
 
 
