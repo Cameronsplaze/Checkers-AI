@@ -26,7 +26,7 @@ public:
 class Player
 {
 public:
-	Player(const std::string &plr_type, bool redTeam, sf::RenderWindow &window);
+	Player(const std::string &plr_type, bool redTeam, sf::RenderWindow &window, sf::Event &event);
 	std::bitset<96> getMove(std::vector<std::unique_ptr<SpriteChecker>> &startBoard);
 
 private:
@@ -35,7 +35,10 @@ private:
 	void swapCheckers(int f, int s, std::unique_ptr<SpriteChecker> &swapStorage, std::vector<std::unique_ptr<SpriteChecker>> &checkers);
 	bool JumpingRecursively(int pieceIndex, std::vector<std::unique_ptr<SpriteChecker>> &checkers);
 
+	// For GUI:
 	sf::RenderWindow &window_;
+	sf::Event &event_;
+	// For Player logic:
 	std::string playerType_;
 	const bool isRedTeam_;
 };

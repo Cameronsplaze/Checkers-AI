@@ -45,6 +45,7 @@ private:
 
 	//window
 	sf::RenderWindow window_; // Starting with 648 since that's default width/height of checkerboard
+	sf::Event event_; // Only one event, so that if you close anywhere, everything just returns out.
 };
 
 

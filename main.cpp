@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     // std::cout << tmpB2 << " Start" << std::endl; 
 
     // ######################
-    // CheckerboardGUI("random", "random");
+    // CheckerboardGUI("human", "human");
     CheckerboardGUI("random", "piece_count");
     // ######################
 

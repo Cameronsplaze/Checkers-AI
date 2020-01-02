@@ -3,15 +3,16 @@
 #include "../include/player.hpp"
 
 
-Player::Player(const std::string &plr_type, bool redTeam, sf::RenderWindow &window) :
+Player::Player(const std::string &plr_type, bool redTeam, sf::RenderWindow &window, sf::Event &event) :
 	window_(window),
+	event_(event),
 	isRedTeam_(redTeam),
 	playerType_(plr_type)
 {
 	if(! ( playerType_ == "human" || 
 		   playerType_ == "random" || 
 		   playerType_ == "piece_count" || 
-		   playerType_ == "AI"))
+		   playerType_ == "AI" ))
 	{
 		playerType_ = "unknown";
 		std::cout << "UNKNOWN PLAYER PASSED - either 'human', 'random', 'piece_count', or 'AI' please." << std::endl;
@@ -50,15 +51,15 @@ std::bitset<96> Player::getMove(std::vector<std::unique_ptr<SpriteChecker>> &che
 
 void Player::humanManager(std::vector<std::unique_ptr<SpriteChecker>> &checkers)
 {
-	sf::Event evnt;
 	while( window_.isOpen() )
 	{
-		if(window_.waitEvent(evnt))
+		if(window_.waitEvent(event_))
 		{
-			switch(evnt.type)
+			switch(event_.type)
 			{
 				case sf::Event::Closed:{
 					window_.close();
+					std::cout << "Exiting human manager" << std::endl;
 					return;
 				}break;
 
@@ -150,11 +151,11 @@ int Player::MousePositionToInt(sf::Vector2i locationClicked)
 {
 	uint x = (locationClicked.x - 26)/76; // 0-7
 	uint y = (locationClicked.y - 26)/76; // 0-7
-
-	if(x%2 == y%2 || x > 7 || y > 7) // if you click on the boarder, x y can "be" >7
+	// If you click on one of the squares between checkers, or on the right/bottom border of the board:
+	if(x%2 == y%2 || x > 7 || y > 7)
 		return -1;
-
-	if(x%2 == 0)
+	// Check if even/odd row:
+	else if(x%2 == 0)
 		return x/2 + y*4;
 	else// x%2 == 1
 		return (x-1)/2 + y*4;

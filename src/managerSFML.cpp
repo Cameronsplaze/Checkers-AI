@@ -7,8 +7,8 @@
 
 CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string &player2)
 	: window_(sf::VideoMode(648,648), "A not-yet-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close),
-	  player1_(player1, true, window_),
-	  player2_(player2, false, window_),
+	  player1_(player1, true, window_, event_),
+	  player2_(player2, false, window_, event_),
 	  isPlayer1Turn_(NUM_RANDO_TURNS % 2 == 0)
 {
 	window_.setFramerateLimit(30);
@@ -122,15 +122,12 @@ void CheckerboardGUI::mainGameloop()
 {
 	while (window_.isOpen())
 	{
-		// Look into this, instead of the window in constructor:
-		// sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
 
-		sf::Event event;
-
-		while(window_.pollEvent(event))
+		while(window_.pollEvent(event_))
 		{
 			// If they closed the window:
-			if(event.type == sf::Event::Closed){
+			if(event_.type == sf::Event::Closed){
+				std::cout << "CLOSING WINDOW, main GameLoop" << std::endl;
 				window_.close();
 				return;
 			}
@@ -148,6 +145,7 @@ void CheckerboardGUI::mainGameloop()
 			}
 		}
 	}
+	std::cout << "Exited main game loop" << std::endl;
 }
 
 
