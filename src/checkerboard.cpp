@@ -320,19 +320,6 @@ void CheckerBoardMoves::JumpingRecursion(uint i, uint j, bool currTeamDirection)
 ////////////    ----- "Helper" Functions -----    ////////////
 //////////////////////////////////////////////////////////////
 
-std::bitset<96> getStartBoard()
-{
-	std::bitset<96> theBoard = stringToBoard(START_BOARD);
-	bool redTurn = true;
-	for(uint i=0; i<NUM_RANDO_TURNS; ++i)
-	{
-		theBoard = CheckerBoardMoves(theBoard, redTurn).getRandoMove();
-		redTurn = !redTurn;
-	}
-
-	return theBoard;
-}
-
 
 
 std::string boardToString(const std::bitset<96> startBoard)

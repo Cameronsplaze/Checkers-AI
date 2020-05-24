@@ -70,7 +70,6 @@ private:
 	std::shared_ptr<LookupTable> oppTeamJumpBoard_;
 };
 
-std::bitset<96> getStartBoard();
 std::string boardToString(const std::bitset<96> startBoard);
 std::bitset<96> stringToBoard(const std::string &charBoard);
 
