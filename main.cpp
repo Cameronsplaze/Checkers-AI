@@ -3,12 +3,13 @@
 #include <iostream>
 #include <string>
 #include <bitset>
+#include <memory>
 
 #include "include/globalconsts.hpp"
 #include "include/checkerboard.hpp"
-#include "include/managerSFML.hpp"
+// #include "include/managerSFML.hpp"
 #include "include/cxxopts.hpp"
-
+#include "include/singleGameLoop.hpp"
 #include "include/negamax.hpp"
 #include "include/catch.hpp"
 // #include "include/tests.hpp" // make tests.cpp too to reduce compile time.
@@ -45,7 +46,10 @@ int main(int argc, char *argv[])
 
     // ######################
     // CheckerboardGUI("human", "human");
-    CheckerboardGUI("random", "piece_count");
+    // CheckerboardGUI("random", "piece_count");
+    std::shared_ptr<Player> player1 = std::make_shared<Player>("random");
+    std::shared_ptr<Player> player2 = std::make_shared<Player>("random");
+    Game(player1, player1, false);
     // ######################
 
     // std::vector<std::bitset<96>> possBoards = std::move( CheckerBoardMoves(tmpB1, redTurn, false).getAllMoves() );
