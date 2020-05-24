@@ -23,6 +23,7 @@ set(SOURSE_FILES
 	src/player.cpp
 	src/negamax.cpp
 	src/tests.cpp
+	src/singleGameLoop.cpp
 )
 set(HEADER_FILES
 	include/catch.hpp
@@ -32,6 +33,7 @@ set(HEADER_FILES
 	include/player.hpp
 	include/negamax.hpp
 	include/cxxopts.hpp
+	include/singleGameLoop.hpp
 )
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURSE_FILES})
