@@ -6,16 +6,23 @@
 #include <bitset>		// std::bitset
 #include <chrono> 		// std::chrono_literals
 #include <thread> 		// std::this_thread::sleep_for
+#include <memory>		// std::shared_ptr
 
 #include "checkerboard.hpp"
 #include "negamax.hpp"
-
+#include "managerSFML.hpp"
 
 class Player
 {
 public:
-	Player(const std::string &plr_type);
-	std::bitset<96> getMove(const std::bitset<96> &bitBoard, bool isReadTeam);
+	Player(
+		const std::string &plr_type
+	);
+	std::bitset<96> getMove(
+		const std::bitset<96> &bitBoard,
+		bool isReadTeam,
+		std::shared_ptr<GUI> gameGUI = nullptr
+	);
 
 private:
 	const std::string playerType_;

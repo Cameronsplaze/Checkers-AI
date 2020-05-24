@@ -15,9 +15,8 @@ Player::Player(const std::string &plr_type) :
 	}
 }
 
-std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isReadTeam)
+std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isReadTeam, std::shared_ptr<GUI> gameGUI)
 {
-	std::bitset<96> bestBoard;
 	if(playerType_ == "human")
 	{
 		// TODO
@@ -27,11 +26,19 @@ std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isReadTeam
 		using namespace std::chrono_literals;
 		// Just so that it doesn't instantly finish moving. Might remove later:
 		std::this_thread::sleep_for(2s);
-		return CheckerBoardMoves(bitBoard, isReadTeam).getRandoMove();
+		std::bitset<96> newBoard = CheckerBoardMoves(bitBoard, isReadTeam).getRandoMove();
+		if (gameGUI != nullptr){
+			gameGUI->setBoard(newBoard);
+		}
+		return newBoard;
 	}
 	else if(playerType_ == "piece_count")
 	{
-		return Negamax(bitBoard, isReadTeam).getBestBoard();
+		std::bitset<96> newBoard = Negamax(bitBoard, isReadTeam).getBestBoard();
+		if (gameGUI != nullptr){
+			gameGUI->setBoard(newBoard);
+		}
+		return newBoard;
 	}
 	std::bitset<96> tmp(0);
 	return tmp;
