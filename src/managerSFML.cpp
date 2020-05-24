@@ -3,28 +3,30 @@
 
 
 
-
-
-CheckerboardGUI::CheckerboardGUI(const std::string &player1, const std::string &player2)
-	: window_(sf::VideoMode(648,648), "A not-yet-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close),
-	  player1_(player1, true, window_, event_),
-	  player2_(player2, false, window_, event_),
-	  isPlayer1Turn_(NUM_RANDO_TURNS % 2 == 0)
+GUI::GUI()
+    : window_(sf::VideoMode(648,648), "A not-yet-so-great Checkers AI", sf::Style::Titlebar | sf::Style::Close)
 {
-	window_.setFramerateLimit(30);
-
+    window_.setFramerateLimit(30);
 	// load textures - If fails, can't do anything
 	bool success = loadTextures();
 	if(!success){
 		return;
 	}
-	// setup checkers_ vec for updating board
-
-	updateSprites(getStartBoard());
-	mainGameloop();
 }
 
-bool CheckerboardGUI::loadTextures()
+void GUI::setBoard(const std::bitset<96> newBoard)
+{
+    checkersUpdate(newBoard);
+    windowUpdate();
+    processEvents();
+}
+
+bool GUI::isWindowOpen()
+{
+    return window_.isOpen();
+}
+
+bool GUI::loadTextures()
 {
 	const std::string CBimage = "checkerboard.PNG";
 	const std::string WCimage = "whitechecker.png";
@@ -60,14 +62,33 @@ bool CheckerboardGUI::loadTextures()
 	return true;
 }
 
-void CheckerboardGUI::updateSprites(std::bitset<96> startBoard)
+
+// Goes from the squares id (0-31), to x-y values. Then multiplies 
+//      them by a width of a single square
+const sf::Vector2f GUI::intToCords(uint i)
+{
+	uint x1;
+	uint y1 = i/4;
+
+	i = i%8;
+	if(i > 3)
+		x1 = 2*i-8;
+	else // if x1%8 <= 3
+		x1 = 2*i+1;
+
+	float x = x1*76.0 + 26.0;
+	float y = y1*76.0 + 26.0;
+	return sf::Vector2f(x, y);
+}
+
+void GUI::checkersUpdate(const std::bitset<96> newBoard)
 {
 	checkers_.clear();
 	checkers_.resize(32);
 	for(uint i=0; i<32; ++i)
 	{
 		// if no checker
-		if(startBoard[i+32] == 0 && startBoard[i+64] == 0)
+		if(newBoard[i+32] == 0 && newBoard[i+64] == 0)
 		{
 			checkers_[i] = nullptr;
 			continue;
@@ -78,9 +99,9 @@ void CheckerboardGUI::updateSprites(std::bitset<96> startBoard)
 			checkers_[i] = std::make_unique<SpriteChecker>(checker);
 		}
 		// if red checker
-		if(startBoard[i+32] == 1 && startBoard[i+64] == 0)
+		if(newBoard[i+32] == 1 && newBoard[i+64] == 0)
 		{
-			if(startBoard[i] == 0)
+			if(newBoard[i] == 0)
 			{
 				checkers_[i]->sprite.setTexture(whiteCheckerTexture_);
 				checkers_[i]->sprite.setPosition(intToCords(i));
@@ -96,9 +117,9 @@ void CheckerboardGUI::updateSprites(std::bitset<96> startBoard)
 			}
 		}
 		// if black checker
-		else if(startBoard[i+32] == 0 && startBoard[i+64] == 1)
+		else if(newBoard[i+32] == 0 && newBoard[i+64] == 1)
 		{
-			if(startBoard[i] == 0)
+			if(newBoard[i] == 0)
 			{
 				checkers_[i]->sprite.setTexture(blackCheckerTexture_);
 				checkers_[i]->sprite.setPosition(intToCords(i));
@@ -116,40 +137,7 @@ void CheckerboardGUI::updateSprites(std::bitset<96> startBoard)
 	}
 }
 
-
-
-void CheckerboardGUI::mainGameloop()
-{
-	while (window_.isOpen())
-	{
-
-		while(window_.pollEvent(event_))
-		{
-			// If they closed the window:
-			if(event_.type == sf::Event::Closed){
-				std::cout << "CLOSING WINDOW, main GameLoop" << std::endl;
-				window_.close();
-				return;
-			}
-			else
-			{
-				windowUpdate();
-				if(isPlayer1Turn_){
-					updateSprites(player1_.getMove(checkers_));
-					isPlayer1Turn_ = false;
-				}
-				else{
-					updateSprites(player2_.getMove(checkers_));
-					isPlayer1Turn_ = true;
-				}
-			}
-		}
-	}
-	std::cout << "Exited main game loop" << std::endl;
-}
-
-
-void CheckerboardGUI::windowUpdate()
+void GUI::windowUpdate()
 {
 	// handle drawing stuff:
 	window_.clear();
@@ -162,6 +150,23 @@ void CheckerboardGUI::windowUpdate()
 	}
 	window_.display();
 }
+
+void GUI::processEvents()
+{
+    sf::Event event;
+    while(window_.pollEvent(event))
+    {
+        switch(event.type)
+        {
+            // They press the 'x' button:
+            case sf::Event::Closed:
+				std::cout << "CLOSING WINDOW: User pressed 'x'." << std::endl;
+				window_.close();
+				return;        
+        }
+    }
+}
+
 
 
 

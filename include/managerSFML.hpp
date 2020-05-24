@@ -11,44 +11,52 @@
 #include <algorithm> // find, swap
 
 #include "globalconsts.hpp"
-#include "player.hpp"
 
-
-
-class CheckerboardGUI
+class SpriteChecker
 {
 public:
-	CheckerboardGUI(const std::string &player1, const std::string &player2);
+	sf::Sprite sprite;
+	bool isRed = false;
+	bool king = false;
+};
+
+class GUI
+{
+public:
+    GUI();
+    // Update what's on screen, with newBoard:
+    void setBoard(const std::bitset<96> newBoard);
+    // whether some human closed the window:
+    bool isWindowOpen();
 
 private:
-	void updateSprites(std::bitset<96> startBoard);
-	void windowUpdate();
-	bool loadTextures();
-	void mainGameloop();
+    // Load the initial textures from the images dir:
+    bool loadTextures();
+    // Convert ID (0-31) to x,y on checker board:
+    const sf::Vector2f intToCords(uint i);
+    // Update the checkers_ variable with newBoard:
+    void checkersUpdate(const std::bitset<96> newBoard);
+    // Update what's on screen, with checkers_:
+    void windowUpdate();
+    // Process any events that happened since last call:
+    void processEvents();
 
+private:
+    // Window Stuff:
+    sf::RenderWindow window_;
 
-	//players
-	Player player1_;
-	Player player2_;
+    // Sprite Stuff:
+    std::vector<std::unique_ptr<SpriteChecker>> checkers_;
+    sf::Sprite checkerboard_;
 
-	bool isPlayer1Turn_;
-	// Textures
+    // Texture Stuff:
 	sf::Texture checkerboardTexture_;
 	sf::Texture whiteCheckerTexture_;
 	sf::Texture whiteCheckerKingTexture_;
 	sf::Texture blackCheckerTexture_;
 	sf::Texture blackCheckerKingTexture_;
-
-	// Sprites
-	std::vector<std::unique_ptr<SpriteChecker>> checkers_;
-	sf::Sprite checkerboard_;
-
-	//window
-	sf::RenderWindow window_; // Starting with 648 since that's default width/height of checkerboard
-	sf::Event event_; // Only one event, so that if you close anywhere, everything just returns out.
+    
 };
-
-
 
 
 #endif
