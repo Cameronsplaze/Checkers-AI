@@ -6,21 +6,24 @@
 
 #include "player.hpp"			// class Player;
 #include "checkerboard.hpp"		// stringToBoard();
-#include "globalconsts.hpp"
+#include "globalconsts.hpp"		// START_BOARD, NUM_RANDO_TURNS, etc.
+#include "managerSFML.hpp"		// class GUI;
 
 std::bitset<96> getStartBoard();
 
 class Game
 {
 public:
-	Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, 				   // the players
-		 const bool &useGUI=false,						   // if you want a gui
-		 std::bitset<96> start_board = getStartBoard());   // what the default board looks like (for testing)
+	Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, 	// the players
+		 const bool useGUI = false,						   					// override if you want a gui
+		 std::bitset<96> start_board = getStartBoard());   					// what the default board looks like (for testing)
 	
 private:
 	std::shared_ptr<Player> player1_;
 	std::shared_ptr<Player> player2_;
 	const bool useGUI_;
+
+	std::shared_ptr<GUI> gameGUI_;
 };
 
 
