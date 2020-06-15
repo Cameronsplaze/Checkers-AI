@@ -11,13 +11,14 @@
 #include <algorithm> // find, swap
 
 #include "globalconsts.hpp"
+#include "checkerboard.hpp"
 
 class SpriteChecker
 {
 public:
 	sf::Sprite sprite;
 	bool isRed = false;
-	bool king = false;
+	bool isKing = false;
 };
 
 class GUI
@@ -26,27 +27,38 @@ public:
     GUI();
     // Update what's on screen, with newBoard:
     void setBoard(const std::bitset<96> newBoard);
+    // Get board from GUI:
+    std::bitset<96> getCheckersFromGUI();
     // whether some human closed the window:
     bool isWindowOpen();
+    // Wrapper around the one that takes in an event:
+    void checkQuitGUI();
+    // Let the player choose the first checker they want to move:
+    int getFirstChecker(bool isRedTeam);
+    // Let the player keep moving it til it's done/they do something invalid:
+    int getNextChecker(int prevCheckerID, bool isRedTeam);
 
 private:
+    // Check if someone pressed 'x', and quit out
+    void checkQuitGUI(sf::Event event);
     // Load the initial textures from the images dir:
     bool loadTextures();
     // Convert ID (0-31) to x,y on checker board:
     const sf::Vector2f intToCords(uint i);
+    // Take where the player clicked, and make it 0-31, or -1. 
+    //     (Based on which checker):
+    int MousePositionToInt(const sf::Vector2i locationClicked);
     // Update the checkers_ variable with newBoard:
     void checkersUpdate(const std::bitset<96> newBoard);
     // Update what's on screen, with checkers_:
     void windowUpdate();
-    // Process any events that happened since last call:
-    void processEvents();
 
 private:
     // Window Stuff:
     sf::RenderWindow window_;
 
     // Sprite Stuff:
-    std::vector<std::unique_ptr<SpriteChecker>> checkers_;
+    std::vector<std::shared_ptr<SpriteChecker>> checkers_;
     sf::Sprite checkerboard_;
 
     // Texture Stuff:

@@ -24,6 +24,8 @@ Game::Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, con
 	if (useGUI_){
 		gameGUI_ = std::make_shared<GUI>();
 		gameGUI_->setBoard(start_board);
+		player1_->setGUI(gameGUI_);
+		player2_->setGUI(gameGUI_);
 	}
 	// Check how many random moves you take, to see who's turn starts:
 	std::bitset<96> current_board = start_board;

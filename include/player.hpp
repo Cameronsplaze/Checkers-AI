@@ -15,17 +15,16 @@
 class Player
 {
 public:
-	Player(
-		const std::string &plr_type
-	);
-	std::bitset<96> getMove(
-		const std::bitset<96> &bitBoard,
-		bool isReadTeam,
-		std::shared_ptr<GUI> gameGUI = nullptr
-	);
+	Player(const std::string &plr_type);
+	void setGUI(std::shared_ptr<GUI> &gameGUI);
+	std::bitset<96> getMove(const std::bitset<96> &bitBoard, bool isRedTeam);
+	
+private:	
+	bool validMovesRecursive(int firstCheckerID, const std::bitset<96> &oldMove, bool isRedTeam);
 
 private:
 	const std::string playerType_;
+	std::shared_ptr<GUI> gameGUI_;
 };
 
 #endif
