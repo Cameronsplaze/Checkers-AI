@@ -11,20 +11,11 @@
 CheckerBoardMoves::CheckerBoardMoves(const std::bitset<96> &startBoard, const bool redPlayerTurn, bool jumpOnlyOnce):
 	redTeamTurn_(redPlayerTurn), firstJumpFound_(false), jumpOnlyOnce_(jumpOnlyOnce)
 {
-	if(redTeamTurn_)
-	{
-		currTeamMoveBoard_ = RED_MOVE_BOARD;
-		currTeamJumpBoard_ = RED_JUMP_BOARD;
-		oppTeamMoveBoard_ = BLACK_MOVE_BOARD;
-		oppTeamJumpBoard_ = BLACK_JUMP_BOARD;
-	}
-	else
-	{
-		currTeamMoveBoard_ = BLACK_MOVE_BOARD;
-		currTeamJumpBoard_ = BLACK_JUMP_BOARD;
-		oppTeamMoveBoard_ = RED_MOVE_BOARD;
-		oppTeamJumpBoard_ = RED_JUMP_BOARD;
-	}
+	// Look at the move/jump tables, based on who's turn it is: (Lets kings use both)
+	currTeamMoveBoard_ = (redTeamTurn_) ? RED_MOVE_BOARD : BLACK_MOVE_BOARD;
+	currTeamJumpBoard_ = (redTeamTurn_) ? RED_JUMP_BOARD : BLACK_JUMP_BOARD;
+	oppTeamMoveBoard_ = (redTeamTurn_) ? BLACK_MOVE_BOARD : RED_MOVE_BOARD;
+	oppTeamJumpBoard_ = (redTeamTurn_) ? BLACK_JUMP_BOARD : RED_JUMP_BOARD;
 
 	checkers_.resize(32);
 	for(uint i=0; i<32; ++i)
