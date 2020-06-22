@@ -37,8 +37,9 @@ std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isRedTeam)
 			if(checkerID == -1){
 				break;
 			}
+			gameGUI_->highlightChecker(checkerID);
 			// Keep calling recurse, til they give you a valid board:
-			if( this->validMovesRecursive(checkerID, bitBoard, isRedTeam) ){
+			if( gameGUI_->getNextChecker(checkerID, isRedTeam) ){
 				return gameGUI_->getCheckersFromGUI();
 			}
 		}

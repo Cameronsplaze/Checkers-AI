@@ -31,12 +31,14 @@ public:
     std::bitset<96> getCheckersFromGUI();
     // whether some human closed the window:
     bool isWindowOpen();
+    // Let the player choose the first checker they want to move:
+    int getFirstChecker(const bool isRedTeam, const bool validate=true);
+    // Let the player keep moving it til it's done/they do something invalid:
+    bool getNextChecker(const int prevCheckerID, const bool isRedTeam);
+    // Highlight a checker: (for if a human player clicks on one)
+    void highlightChecker(int checkerID);
     // Wrapper around the one that takes in an event:
     void checkQuitGUI();
-    // Let the player choose the first checker they want to move:
-    int getFirstChecker(bool isRedTeam);
-    // Let the player keep moving it til it's done/they do something invalid:
-    int getNextChecker(int prevCheckerID, bool isRedTeam);
 
 private:
     // Check if someone pressed 'x', and quit out

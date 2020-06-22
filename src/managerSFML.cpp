@@ -57,6 +57,101 @@ bool GUI::isWindowOpen()
     return window_.isOpen();
 }
 
+// Let the player choose the first checker they want to move:
+int GUI::getFirstChecker(const bool isRedTeam, const bool validate)
+{
+	sf::Event event;
+	while(window_.waitEvent(event))
+	{
+		// This handles checking if the user quits out:
+		checkQuitGUI(event);
+		// This handles clicking on a checker:
+		switch(event.type)
+		{
+			case sf::Event::MouseButtonPressed:
+				int ID = MousePositionToInt(sf::Mouse::getPosition(window_));
+				if(validate && (ID == -1 || checkers_[ID] == nullptr || checkers_[ID]->isRed != isRedTeam)){
+					break;
+				}
+				return ID;
+		}
+	}
+	// This gets hit if waitEvent hits an error and returns false:
+	return -1;
+}
+
+// Let the player keep moving it til it's done/they do something invalid:
+bool GUI::getNextChecker(const int oldCheckerID, const bool isRedTeam)
+{
+	std::bitset<96> originalBoard = getCheckersFromGUI();
+	// For checking if you make a valid move, or 
+	//	  if you make one that might LEAD to a valid move:
+	CheckerBoardMoves endMoves(originalBoard, isRedTeam, false);
+	CheckerBoardMoves nextMove(originalBoard, isRedTeam, true);
+	
+	// Get a new checker (false skips the validate step, so it can be a blank square):
+	int newCheckerID = getFirstChecker(isRedTeam, false);
+	if(newCheckerID == -1){
+		return false;
+	}
+	// After you swap them, see if the checker in the new location should become a king:
+	checkers_[oldCheckerID].swap(checkers_[newCheckerID]);
+	bool wasKing = checkers_[newCheckerID]->isKing;
+	if((  isRedTeam && (newCheckerID == 28 || newCheckerID == 29 || newCheckerID == 30 || newCheckerID == 31)) ||
+		( !isRedTeam && (newCheckerID == 0  || newCheckerID == 1  || newCheckerID == 2  || newCheckerID == 3 )) ){
+		checkers_[newCheckerID]->isKing = true;
+	}
+
+	// If the checker 'jumped' something, delete it:
+	std::shared_ptr<LookupTable> teamMoveBoard = (isRedTeam) ? RED_MOVE_BOARD : BLACK_MOVE_BOARD;
+	std::shared_ptr<LookupTable> teamJumpBoard = (isRedTeam) ? RED_JUMP_BOARD : BLACK_JUMP_BOARD;
+	std::shared_ptr<LookupTable> oppMoveBoard = (isRedTeam) ? BLACK_MOVE_BOARD : RED_MOVE_BOARD;
+	std::shared_ptr<LookupTable> oppJumpBoard = (isRedTeam) ? BLACK_JUMP_BOARD : RED_JUMP_BOARD;
+	// For 0=left, 1=right. (Check both sides):
+	for(uint i=0; i<2; ++i)
+	{
+		// If you jumped a checker:
+		if( (*teamJumpBoard)[oldCheckerID][i] == newCheckerID ){
+			int jumpedOverID = (*teamMoveBoard)[oldCheckerID][i];
+			checkers_[jumpedOverID] = nullptr;
+		}
+		// Incase it's a king that did the jumping, do the other side too:
+		else if( (*oppJumpBoard)[oldCheckerID][i] == newCheckerID ){
+			int jumpedOverID = (*oppMoveBoard)[oldCheckerID][i];
+			checkers_[jumpedOverID] = nullptr;
+		}
+	}
+
+	// Now compare the current board, to the possible valid boards:
+	std::bitset<96> newBoard = getCheckersFromGUI();
+	setBoard(newBoard); // <-- To redraw the new move
+	highlightChecker(newCheckerID);
+
+	// If it IS the finishing board:
+	if(endMoves.isValidBoard(newBoard)){
+		setBoard(newBoard); // <-- To redraw the new move
+		return true; // You got one, you're done!
+	}
+	// If it LEADS to a finishing board:
+	else if(nextMove.isValidBoard(newBoard) && getNextChecker(newCheckerID, isRedTeam)){
+		return true;
+	}
+	// Else they made a invalid move:
+	else{
+		return false;
+	}
+}
+
+void GUI::highlightChecker(int checkerID)
+{
+	if(checkerID == -1 || checkers_[checkerID] == nullptr){
+		return;
+	}
+	// Handle it's highlighting/displaying:
+	checkers_[checkerID]->sprite.setColor(sf::Color(200,200,200,200));
+	windowUpdate();
+}
+
 // Goes through ALL events in queue:
 void GUI::checkQuitGUI()
 {
@@ -88,7 +183,6 @@ void GUI::checkQuitGUI(sf::Event event)
 
 bool GUI::loadTextures()
 {
-	std:: cout << "HIT loadTextures" << std::endl;
 	const std::string CBimage = "checkerboard.PNG";
 	const std::string WCimage = "whitechecker.png";
 	const std::string WCKimage = "whitecheckerking.png";
@@ -223,129 +317,5 @@ void GUI::windowUpdate()
 	window_.display();
 }
 
-// Let the player choose the first checker they want to move:
-int GUI::getFirstChecker(bool isRedTeam)
-{
-	return 0; // PLACE HOLDER!! TODO: WRITE THIS <---------
-}
-
-// Let the player keep moving it til it's done/they do something invalid:
-int GUI::getNextChecker(int prevCheckerID, bool isRedTeam)
-{
-	return 0; // PLACE HOLDER!! TODO: WRITE THIS <---------
-}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// std::bitset<96> GUI::getHumanMove(bool isRedTeam)
-// {
-// 	sf::Event event;
-// 	while(window_.isOpen())
-// 	{
-// 		if(!window_.waitEvent(event)){
-// 			continue;
-// 		}
-// 		// Check if the event is related to quitting:
-// 		checkQuitGUI(event);
-// 		// If it's NOT a click, don't care:
-// 		if(event.type != sf::Event::MouseButtonPressed){
-// 			continue;
-// 		}
-// 		// Check if it's clicking on a checker:
-// 		int ID = MousePositionToInt(sf::Mouse::getPosition(window_));
-// 		if(ID == -1 || checkers_[ID] == nullptr || checkers_[ID]->isRed != isRedTeam){
-// 			continue;
-// 		}
-// 		std::shared_ptr<SpriteChecker> checker = checkers_[ID];
-// 		highlightChecker(checker, true);
-// 		// If true, player give valid board. False, try again:
-// 		bool validMove = JumpingRecursively(ID, isRedTeam);
-// 		highlightChecker(checker, false);
-// 		if(validMove){
-// 			return getCheckersFromGUI();
-// 		}
-// 	}
-// }
-
-
-// bool GUI::JumpingRecursively(int oldCheckerID, bool isRedTeam)
-// {
-// 	std::bitset<96> oldCheckerBoard = getCheckersFromGUI();
-// 	CheckerBoardMoves endMoves(oldCheckerBoard, isRedTeam, false);
-// 	CheckerBoardMoves nextMove(oldCheckerBoard, isRedTeam, true);
-
-// 	sf::Event event;
-// 	while(window_.isOpen())
-// 	{
-// 		if(!window_.waitEvent(event)){
-// 			return false; // <-No clue why this could return here, but just in case.
-// 		}
-// 		// Check if the event is related to quitting:
-// 		checkQuitGUI(event);
-// 		// Check if it's clicking on a checker:
-// 		if(event.type != sf::Event::MouseButtonPressed){
-// 			continue;
-// 		}
-// 		int newCheckerID = MousePositionToInt(sf::Mouse::getPosition(window_));
-// 		if(newCheckerID == -1){
-// 			return false;
-// 		}
-		
-// 		// After you swap them, see if the checker in the new location should become a king:
-// 		checkers_[oldCheckerID].swap(checkers_[newCheckerID]);
-// 		bool wasKing = checkers_[newCheckerID]->isKing;
-// 		if((  isRedTeam && (newCheckerID == 28 || newCheckerID == 29 || newCheckerID == 30 || newCheckerID == 31)) ||
-// 		   ( !isRedTeam && (newCheckerID == 0  || newCheckerID == 1  || newCheckerID == 2  || newCheckerID == 3 )) ){
-// 			checkers_[newCheckerID]->isKing = true;
-// 		}
-// 		std::bitset<96> newCheckerBoard = getCheckersFromGUI();
-// 		// If it IS the finishing board:
-// 		if(endMoves.isValidBoard(newCheckerBoard)){
-// 			return true; // You got one, you're done!
-// 		}
-// 		// If it LEADS to a finishing board:
-// 		if(nextMove.isValidBoard(newCheckerBoard) && JumpingRecursively(newCheckerID, isRedTeam)){
-// 			return true;
-// 		}
-// 		// It's not a valid board... Cleanup:
-// 		checkers_[newCheckerID].swap(checkers_[oldCheckerID]);
-// 		checkers_[newCheckerID]->isKing = wasKing;
-// 		return false;
-// 	}
-// }
-
-// void GUI::highlightChecker(std::shared_ptr<SpriteChecker> checker, bool makeHighlighted)
-// {
-
-// 	// Handle it's highlighting/displaying:
-// 	if(makeHighlighted){
-// 		checker->sprite.setColor(sf::Color(200,200,200,200));
-// 	}
-// 	else{
-// 		checker->sprite.setColor(sf::Color(255,255,255,255));
-// 	}
-// 	window_.draw(checker->sprite);
-// 	window_.display();
-
-// }

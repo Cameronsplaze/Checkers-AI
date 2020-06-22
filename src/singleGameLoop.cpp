@@ -21,7 +21,8 @@ Game::Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, con
 	  useGUI_(useGUI)
 {
 	// Create GUI, update with the starting checker positions:
-	if (useGUI_){
+	if (useGUI_)
+	{
 		gameGUI_ = std::make_shared<GUI>();
 		gameGUI_->setBoard(start_board);
 		player1_->setGUI(gameGUI_);
@@ -31,12 +32,10 @@ Game::Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, con
 	std::bitset<96> current_board = start_board;
 	bool isRedTurn = NUM_RANDO_TURNS%2 == 0;
 
-
 	while(true)
 	{
 		std::shared_ptr<Player> current_plr = (isRedTurn) ? player1_ : player2_;
-		current_board = current_plr->getMove(current_board, isRedTurn, gameGUI_);
-
+		current_board = current_plr->getMove(current_board, isRedTurn);
 		// If it's an empty board, that player had no moves:
 		if(current_board == std::bitset<96>(0)){
 			break;
