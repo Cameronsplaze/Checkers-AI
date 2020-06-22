@@ -35,8 +35,8 @@ public:
     int getFirstChecker(const bool isRedTeam, const bool validate=true);
     // Let the player keep moving it til it's done/they do something invalid:
     bool getNextChecker(const int prevCheckerID, const bool isRedTeam);
-    // Highlight a checker: (for if a human player clicks on one)
-    void highlightChecker(int checkerID);
+    // Highlight a checker: highlightOn=>false dehighlights a checker
+    void highlightChecker(int checkerID, bool highlightOn=true);
     // Wrapper around the one that takes in an event:
     void checkQuitGUI();
 

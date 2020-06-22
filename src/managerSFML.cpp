@@ -124,17 +124,16 @@ bool GUI::getNextChecker(const int oldCheckerID, const bool isRedTeam)
 
 	// Now compare the current board, to the possible valid boards:
 	std::bitset<96> newBoard = getCheckersFromGUI();
-	setBoard(newBoard); // <-- To redraw the new move
-	highlightChecker(newCheckerID);
+	windowUpdate(); // <-- To redraw the new move
 
 	// If it IS the finishing board:
 	if(endMoves.isValidBoard(newBoard)){
-		setBoard(newBoard); // <-- To redraw the new move
+		highlightChecker(newCheckerID, false);
 		return true; // You got one, you're done!
 	}
 	// If it LEADS to a finishing board:
-	else if(nextMove.isValidBoard(newBoard) && getNextChecker(newCheckerID, isRedTeam)){
-		return true;
+	else if(nextMove.isValidBoard(newBoard)){
+		return getNextChecker(newCheckerID, isRedTeam);
 	}
 	// Else they made a invalid move:
 	else{
@@ -142,13 +141,18 @@ bool GUI::getNextChecker(const int oldCheckerID, const bool isRedTeam)
 	}
 }
 
-void GUI::highlightChecker(int checkerID)
+void GUI::highlightChecker(int checkerID, bool highlightOn)
 {
 	if(checkerID == -1 || checkers_[checkerID] == nullptr){
 		return;
 	}
 	// Handle it's highlighting/displaying:
-	checkers_[checkerID]->sprite.setColor(sf::Color(200,200,200,200));
+	if(highlightOn){
+		checkers_[checkerID]->sprite.setColor(sf::Color(200,200,200,200));
+	}
+	else{
+		checkers_[checkerID]->sprite.setColor(sf::Color(255,255,255,255));
+	}
 	windowUpdate();
 }
 
@@ -270,14 +274,12 @@ void GUI::checkersUpdate(const std::bitset<96> newBoard)
 			if(newBoard[i] == 0)
 			{
 				checkers_[i]->sprite.setTexture(whiteCheckerTexture_);
-				checkers_[i]->sprite.setPosition(intToCords(i));
 				checkers_[i]->isRed = true;
 				checkers_[i]->isKing = false;
 			}
 			else
 			{
 				checkers_[i]->sprite.setTexture(whiteCheckerKingTexture_);
-				checkers_[i]->sprite.setPosition(intToCords(i));
 				checkers_[i]->isRed = true;
 				checkers_[i]->isKing = true;
 			}
@@ -288,14 +290,12 @@ void GUI::checkersUpdate(const std::bitset<96> newBoard)
 			if(newBoard[i] == 0)
 			{
 				checkers_[i]->sprite.setTexture(blackCheckerTexture_);
-				checkers_[i]->sprite.setPosition(intToCords(i));
 				checkers_[i]->isRed = false;
 				checkers_[i]->isKing = false;
 			}
 			else
 			{
 				checkers_[i]->sprite.setTexture(blackCheckerKingTexture_);
-				checkers_[i]->sprite.setPosition(intToCords(i));
 				checkers_[i]->isRed = false;
 				checkers_[i]->isKing = true;
 			}
@@ -312,6 +312,7 @@ void GUI::windowUpdate()
 	{
 		if(checkers_[i] == nullptr)
 			continue;
+		checkers_[i]->sprite.setPosition(intToCords(i));
 		window_.draw(checkers_[i]->sprite);
 	}
 	window_.display();
