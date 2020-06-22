@@ -38,7 +38,7 @@ std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isRedTeam)
 				break;
 			}
 			gameGUI_->highlightChecker(checkerID);
-			// Keep calling recurse, til they give you a valid board:
+			// This returns true (recursivly) for each combo jump:
 			if( gameGUI_->getNextChecker(checkerID, isRedTeam) ){
 				return gameGUI_->getCheckersFromGUI();
 			}
@@ -52,11 +52,6 @@ std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isRedTeam)
 		std::bitset<96> newBoard = CheckerBoardMoves(bitBoard, isRedTeam).getRandoMove();
 		if (gameGUI_ != nullptr){
 			gameGUI_->setBoard(newBoard);
-			// If they quit the gui, return a blank board to exit out:
-			gameGUI_->checkQuitGUI();
-			if( !gameGUI_->isWindowOpen() ){
-				return std::bitset<96>(0);
-			}
 		}
 		return newBoard;
 	}
@@ -65,11 +60,6 @@ std::bitset<96> Player::getMove(const std::bitset<96> &bitBoard, bool isRedTeam)
 		std::bitset<96> newBoard = Negamax(bitBoard, isRedTeam).getBestBoard();
 		if (gameGUI_ != nullptr){
 			gameGUI_->setBoard(newBoard);
-			// If they quit the gui, return a blank board to exit out:
-			gameGUI_->checkQuitGUI();
-			if( !gameGUI_->isWindowOpen() ){
-				return std::bitset<96>(0);
-			}
 		}
 		return newBoard;
 	}

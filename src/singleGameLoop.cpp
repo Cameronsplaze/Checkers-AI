@@ -41,8 +41,12 @@ Game::Game(std::shared_ptr<Player> player1, std::shared_ptr<Player> player2, con
 			break;
 		} 
 		// If the window closed, quit:
-		if(!gameGUI_->isWindowOpen()){
-			break;
+		if(useGUI_)
+		{
+			gameGUI_->checkQuitGUI();
+			if(!gameGUI_->isWindowOpen()){
+				return;
+			}
 		}
 		isRedTurn = !isRedTurn;
 	}
