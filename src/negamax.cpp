@@ -51,22 +51,40 @@ float pieceCountScore(const std::bitset<96> &board, const bool redTeam)
 Negamax::Negamax(const std::bitset<96> &board, bool isRedTeam):
 	isRedTeam_(isRedTeam)
 {
+	// NegamaxRecursive(board, START_DEPTH, isRedTeam);
 	std::vector<std::bitset<96>> possible_moves = std::move( CheckerBoardMoves(board, isRedTeam_).getAllMoves() );
 	// zip the board, with it's known score, together into possibleMoves_
 	possibleMoves_.resize(possible_moves.size());
 	for(uint i=0; i<possible_moves.size(); ++i)
 	{
-		possibleMoves_[i] = std::make_pair(possible_moves[i], NegamaxRecursive(board, START_DEPTH, isRedTeam_));
+		possibleMoves_[i] = std::make_pair(possible_moves[i], NegamaxRecursive(board, START_DEPTH, false));
 	}
 	// Sort the list with best score at [0]:
 	std::sort(possibleMoves_.begin(), possibleMoves_.end(), [](auto &a, auto &b) {
 		return a.second > b.second;
 	});
-	std::cout << "Boards:";
+	std::cout << "Boards:\n";
 	for(uint i=0; i<possibleMoves_.size(); ++i){
 		std::cout << "    Board: " << possibleMoves_[i].first << " Score: " << possibleMoves_[i].second << std::endl;
 	}
 }
+
+// float Negamax::NegamaxRecursive(const std::bitset<96> &board, const uint depth_left, const bool isRedMove)
+// {
+// 	bool isRedBoard = !(isRedTeam_^isRedMove);
+// 	int negativeMod = (isRedBoard) ? 1 : -1; 
+// 	std::vector<std::bitset<96>> possible_moves = std::move( CheckerBoardMoves(board, isRedBoard).getAllMoves() );
+// 	// If no possible moves to make, someone lost. return 'infinity':
+// 	if (possible_moves.size() == 0){
+// 		return negativeMod * std::numeric_limits<float>::max();
+// 	}
+// 	// If at the end of the search, score the board:
+// 	if (depth_left == 0){
+// 		return negativeMod * pieceCountScore(board, isRedTeam_);
+// 	}
+
+// 	return 0.0;
+// }
 
 // This is called AFTER you get the first set of boards. It's saying if you move here, what will opponent do.
 // Default: optimizingPlayer=False:
@@ -82,10 +100,10 @@ float Negamax::NegamaxRecursive(const std::bitset<96> &board, const uint depth_l
 		return value * pieceCountScore(board, isRedTeam_);
 	}
 	// closest to inf you'll get. (TODO: see how much speedup you'll get if you fencepost this; check if optimizer already doing it?)
-	float best_score = std::numeric_limits<float>::max();
+	float best_score = -1 * std::numeric_limits<float>::max();
 	for(uint i=0; i<possible_moves.size(); ++i)
 	{
-		best_score = std::max(best_score, NegamaxRecursive(possible_moves[i], depth_left-1, !maximizing_player));
+		best_score = std::max(best_score, -1 * NegamaxRecursive(possible_moves[i], depth_left-1, !maximizing_player));
 	}
 	return best_score;
 
