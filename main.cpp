@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     // ######################
     // CheckerboardGUI("human", "human");
     // CheckerboardGUI("random", "piece_count");
-    std::shared_ptr<Player> player1 = std::make_shared<Player>("random");
+    std::shared_ptr<Player> player1 = std::make_shared<Player>("piece_count");
     std::shared_ptr<Player> player2 = std::make_shared<Player>("human");
     Game(player1, player2, true);
     // ######################
