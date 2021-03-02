@@ -4,6 +4,7 @@
 #include <string>
 #include <bitset>
 #include <memory>
+#include <stdlib.h> //getenv
 
 #include "include/globalconsts.hpp"
 #include "include/checkerboard.hpp"
@@ -21,9 +22,11 @@ int main(int argc, char *argv[])
 {    
 
     // Parser used for command line args: https://github.com/jarro2783/cxxopts
+    // NOTE: 'file' line is just an example for now:
     cxxopts::Options options("Checkers AI", "One AI to rule them all");
     options.add_options()
         ("h,help", "Prints help... maybe")
+        ("g,gui", "Enable GUI. (Default true IF you have one)")
         ("f,file", "File name", cxxopts::value<std::string>())
         ;
     auto result = options.parse(argc, argv);
@@ -33,6 +36,7 @@ int main(int argc, char *argv[])
         std::cout << "IT WORKS!!!!" << std::endl;
         return 0;
     }
+
     // std::cout << boardToString(getStartBoard()) << std::endl;
     // return 0;
 
@@ -45,8 +49,8 @@ int main(int argc, char *argv[])
     // std::cout << tmpB2 << " Start" << std::endl; 
 
     // ######################
-    // CheckerboardGUI("human", "human");
-    // CheckerboardGUI("random", "piece_count");
+    // Good checker text-based UI: https://github.com/jdswalker/Checkers/blob/master/src/Move.cc
+    bool detected_gui = getenv("DISPLAY") != NULL;
     std::shared_ptr<Player> player1 = std::make_shared<Player>("random");
     std::shared_ptr<Player> player2 = std::make_shared<Player>("human");
     Game(player1, player2, true);
